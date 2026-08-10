@@ -11,31 +11,31 @@
 
 
 /********************* INT0中断函数 *************************/
-void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
+void Ext_INT0 (void) __interrupt (INT0_VECTOR)		//进中断时已经清除标志
 {
 	P00 = ~P00;
 }
 
 /********************* INT1中断函数 *************************/
-void Ext_INT1 (void) interrupt INT1_VECTOR		//进中断时已经清除标志
+void Ext_INT1 (void) __interrupt (INT1_VECTOR)		//进中断时已经清除标志
 {
 	P01 = ~P01;
 }
 
 /********************* INT2中断函数 *************************/
-void Ext_INT2 (void) interrupt INT2_VECTOR	//
+void Ext_INT2 (void) __interrupt (INT2_VECTOR)	//
 {
 	P02 = ~P02;
 }
 
 /********************* INT3中断函数 *************************/
-void Ext_INT3 (void) interrupt INT3_VECTOR
+void Ext_INT3 (void) __interrupt (INT3_VECTOR)
 {
 	P03 = ~P03;
 }
 
 /********************* INT4中断函数 *************************/
-void Ext_INT4 (void) interrupt INT4_VECTOR
+void Ext_INT4 (void) __interrupt (INT4_VECTOR)
 {
 	P04 = ~P04;
 }

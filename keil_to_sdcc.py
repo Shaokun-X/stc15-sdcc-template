@@ -156,11 +156,39 @@ SBIT_REGISTER_RE = re.compile(
 #   void timer0(void) interrupt 1
 #   void timer0(void) interrupt 1 using 2
 #
-INTERRUPT_USING_RE = re.compile(r"\binterrupt\s+(\d+)\s+using\s+([0-3])\b")
+INTERRUPT_USING_RE = re.compile(
+    r"""
+    \binterrupt
+    \s+
+    (?P<vector>[A-Za-z_]\w*|\d+)
+    \s+
+    using
+    \s+
+    (?P<bank>[A-Za-z_]\w*|\d+)
+    \b
+    """,
+    re.VERBOSE,
+)
 
-INTERRUPT_RE = re.compile(r"\binterrupt\s+(\d+)\b")
+INTERRUPT_RE = re.compile(
+    r"""
+    \binterrupt
+    \s+
+    (?P<vector>[A-Za-z_]\w*|\d+)
+    \b
+    """,
+    re.VERBOSE,
+)
 
-USING_RE = re.compile(r"\busing\s+([0-3])\b")
+USING_RE = re.compile(
+    r"""
+    \busing
+    \s+
+    (?P<bank>[A-Za-z_]\w*|\d+)
+    \b
+    """,
+    re.VERBOSE,
+)
 
 REENTRANT_RE = re.compile(r"\breentrant\b")
 
