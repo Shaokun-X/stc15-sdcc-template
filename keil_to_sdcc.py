@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 """
 keil2sdcc.py
 
@@ -156,17 +156,11 @@ SBIT_REGISTER_RE = re.compile(
 #   void timer0(void) interrupt 1
 #   void timer0(void) interrupt 1 using 2
 #
-INTERRUPT_USING_RE = re.compile(
-    r"\binterrupt\s+(\d+)\s+using\s+([0-3])\b"
-)
+INTERRUPT_USING_RE = re.compile(r"\binterrupt\s+(\d+)\s+using\s+([0-3])\b")
 
-INTERRUPT_RE = re.compile(
-    r"\binterrupt\s+(\d+)\b"
-)
+INTERRUPT_RE = re.compile(r"\binterrupt\s+(\d+)\b")
 
-USING_RE = re.compile(
-    r"\busing\s+([0-3])\b"
-)
+USING_RE = re.compile(r"\busing\s+([0-3])\b")
 
 REENTRANT_RE = re.compile(r"\breentrant\b")
 
@@ -175,14 +169,13 @@ REENTRANT_RE = re.compile(r"\breentrant\b")
 #
 #   unsigned char x _at_ 0x30;
 #
-AT_RE = re.compile(
-    rf"\b_at_\s*({NUMBER})"
-)
+AT_RE = re.compile(rf"\b_at_\s*({NUMBER})")
 
 
 # ---------------------------------------------------------------------------
 # Results/reporting
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ConversionStats:
@@ -210,6 +203,7 @@ class ConversionStats:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def parse_int(value: str) -> int:
     return int(value, 0)
@@ -293,6 +287,7 @@ def replace_outside_strings(
 # First pass: collect SFR addresses
 # ---------------------------------------------------------------------------
 
+
 def collect_sfrs(text: str) -> dict[str, int]:
     """
     Collect Keil sfr declarations so that:
@@ -349,6 +344,7 @@ def collect_global_sfrs(input_dir: Path) -> dict[str, int]:
 # Specific declaration conversions
 # ---------------------------------------------------------------------------
 
+
 def convert_special_register_line(
     line: str,
     sfrs: dict[str, int],
@@ -366,10 +362,10 @@ def convert_special_register_line(
         stats.sfr += 1
 
         return (
-            f'{m.group("indent")}'
-            f'__sfr __at ({hex8(parse_int(m.group("addr")))}) '
-            f'{m.group("name")};'
-            f'{m.group("trailer")}'
+            f"{m.group('indent')}"
+            f"__sfr __at ({hex8(parse_int(m.group('addr')))}) "
+            f"{m.group('name')};"
+            f"{m.group('trailer')}"
         )
 
     # ---------------------------------------------------------
@@ -382,10 +378,10 @@ def convert_special_register_line(
         stats.sfr16 += 1
 
         return (
-            f'{m.group("indent")}'
-            f'__sfr16 __at ({hex8(parse_int(m.group("addr")))}) '
-            f'{m.group("name")};'
-            f'{m.group("trailer")}'
+            f"{m.group('indent')}"
+            f"__sfr16 __at ({hex8(parse_int(m.group('addr')))}) "
+            f"{m.group('name')};"
+            f"{m.group('trailer')}"
         )
 
     # ---------------------------------------------------------
@@ -398,10 +394,10 @@ def convert_special_register_line(
         stats.sfr32 += 1
 
         return (
-            f'{m.group("indent")}'
-            f'__sfr32 __at ({hex8(parse_int(m.group("addr")))}) '
-            f'{m.group("name")};'
-            f'{m.group("trailer")}'
+            f"{m.group('indent')}"
+            f"__sfr32 __at ({hex8(parse_int(m.group('addr')))}) "
+            f"{m.group('name')};"
+            f"{m.group('trailer')}"
         )
 
     # ---------------------------------------------------------
@@ -414,10 +410,10 @@ def convert_special_register_line(
         stats.sbit += 1
 
         return (
-            f'{m.group("indent")}'
-            f'__sbit __at ({hex8(parse_int(m.group("addr")))}) '
-            f'{m.group("name")};'
-            f'{m.group("trailer")}'
+            f"{m.group('indent')}"
+            f"__sbit __at ({hex8(parse_int(m.group('addr')))}) "
+            f"{m.group('name')};"
+            f"{m.group('trailer')}"
         )
 
     # ---------------------------------------------------------
@@ -443,15 +439,14 @@ def convert_special_register_line(
 
         else:
             stats.warnings.append(
-                f"{location}: cannot resolve SFR '{reg}' "
-                f"for sbit '{name}'"
+                f"{location}: cannot resolve SFR '{reg}' for sbit '{name}'"
             )
 
             return (
-                f'{m.group("indent")}'
-                f'/* KEIL2SDCC TODO: unresolved SFR {reg} */ '
-                f'sbit {name} = {reg}^{bit_number};'
-                f'{m.group("trailer")}'
+                f"{m.group('indent')}"
+                f"/* KEIL2SDCC TODO: unresolved SFR {reg} */ "
+                f"sbit {name} = {reg}^{bit_number};"
+                f"{m.group('trailer')}"
             )
 
         bit_address = base + bit_number
@@ -459,9 +454,9 @@ def convert_special_register_line(
         stats.sbit += 1
 
         return (
-            f'{m.group("indent")}'
-            f'__sbit __at ({hex8(bit_address)}) {name};'
-            f'{m.group("trailer")}'
+            f"{m.group('indent')}"
+            f"__sbit __at ({hex8(bit_address)}) {name};"
+            f"{m.group('trailer')}"
         )
 
     return None
@@ -497,9 +492,7 @@ def convert_memory_keywords(
     """
 
     for keil, sdcc in MEMORY_KEYWORDS.items():
-        pattern = re.compile(
-            rf"(?<![_A-Za-z0-9]){keil}(?![_A-Za-z0-9])"
-        )
+        pattern = re.compile(rf"(?<![_A-Za-z0-9]){keil}(?![_A-Za-z0-9])")
 
         code, count = pattern.subn(sdcc, code)
         stats.memory_keywords += count
@@ -521,9 +514,7 @@ def convert_bit_keyword(
     Do not touch sbit here; SFR bit declarations are handled earlier.
     """
 
-    pattern = re.compile(
-        r"(?<![_A-Za-z0-9])bit(?![_A-Za-z0-9])"
-    )
+    pattern = re.compile(r"(?<![_A-Za-z0-9])bit(?![_A-Za-z0-9])")
 
     code, count = pattern.subn("__bit", code)
     stats.bit_keywords += count
@@ -535,6 +526,7 @@ def convert_bit_keyword(
 # Function attributes
 # ---------------------------------------------------------------------------
 
+
 def convert_function_attributes(
     code: str,
     stats: ConversionStats,
@@ -545,10 +537,7 @@ def convert_function_attributes(
         stats.interrupts += 1
         stats.using += 1
 
-        return (
-            f"__interrupt ({match.group(1)}) "
-            f"__using ({match.group(2)})"
-        )
+        return f"__interrupt ({match.group(1)}) __using ({match.group(2)})"
 
     code = INTERRUPT_USING_RE.sub(
         interrupt_using,
@@ -590,6 +579,7 @@ def convert_function_attributes(
 # ---------------------------------------------------------------------------
 # _at_
 # ---------------------------------------------------------------------------
+
 
 def convert_at_attribute(
     code: str,
@@ -651,9 +641,7 @@ def convert_intrinsics(
 # Header includes
 # ---------------------------------------------------------------------------
 
-INTRINS_INCLUDE_RE = re.compile(
-    r'^\s*#\s*include\s*[<"]intrins\.h[>"]\s*$'
-)
+INTRINS_INCLUDE_RE = re.compile(r'^\s*#\s*include\s*[<"]intrins\.h[>"]\s*$')
 
 
 def convert_include(
@@ -738,14 +726,13 @@ def detect_unsupported(
 
     for regex, message in WARNING_PATTERNS:
         if regex.search(code):
-            stats.warnings.append(
-                f"{location}: {message}"
-            )
+            stats.warnings.append(f"{location}: {message}")
 
 
 # ---------------------------------------------------------------------------
 # Line conversion
 # ---------------------------------------------------------------------------
+
 
 def convert_line(
     line: str,
@@ -830,6 +817,7 @@ def convert_line(
 # Whole-file conversion
 # ---------------------------------------------------------------------------
 
+
 def convert_text(
     text: str,
     sfrs: dict[str, int],
@@ -912,22 +900,16 @@ def convert_folder(
 ) -> ConversionStats:
 
     if not input_dir.exists():
-        raise SystemExit(
-            f"Input directory does not exist: {input_dir}"
-        )
+        raise SystemExit(f"Input directory does not exist: {input_dir}")
 
     if not input_dir.is_dir():
-        raise SystemExit(
-            f"Input path is not a directory: {input_dir}"
-        )
+        raise SystemExit(f"Input path is not a directory: {input_dir}")
 
     input_dir = input_dir.resolve()
     output_dir = output_dir.resolve()
 
     if input_dir == output_dir:
-        raise SystemExit(
-            "Input and output directories must be different."
-        )
+        raise SystemExit("Input and output directories must be different.")
 
     if input_dir in output_dir.parents:
         print(
@@ -998,6 +980,7 @@ def convert_folder(
 # Report
 # ---------------------------------------------------------------------------
 
+
 def write_report(
     output_dir: Path,
     stats: ConversionStats,
@@ -1027,11 +1010,13 @@ def write_report(
     ]
 
     if stats.warnings:
-        lines.extend([
-            "MANUAL REVIEW REQUIRED",
-            "-" * 40,
-            "",
-        ])
+        lines.extend(
+            [
+                "MANUAL REVIEW REQUIRED",
+                "-" * 40,
+                "",
+            ]
+        )
 
         for warning in stats.warnings:
             lines.append(warning)
@@ -1051,12 +1036,10 @@ def write_report(
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description=(
-            "Convert common Keil C51 .c/.h syntax to "
-            "SDCC/mcs51 syntax."
-        )
+        description=("Convert common Keil C51 .c/.h syntax to SDCC/mcs51 syntax.")
     )
 
     parser.add_argument(
@@ -1074,10 +1057,7 @@ def main() -> None:
     parser.add_argument(
         "--no-copy",
         action="store_true",
-        help=(
-            "Do not copy non-.c/.h files to the "
-            "destination directory"
-        ),
+        help=("Do not copy non-.c/.h files to the destination directory"),
     )
 
     args = parser.parse_args()
@@ -1104,10 +1084,7 @@ def main() -> None:
 
     if stats.warnings:
         print()
-        print(
-            "Some constructs require manual review. "
-            "See the report."
-        )
+        print("Some constructs require manual review. See the report.")
 
 
 if __name__ == "__main__":
