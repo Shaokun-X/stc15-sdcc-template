@@ -1,5 +1,5 @@
-#ifndef	_STC15Fxxxx_H
-#define	_STC15Fxxxx_H
+#ifndef	_STC15_H
+#define	_STC15_H
 
 #include <stdbool.h>
 #include <stdio.h>
