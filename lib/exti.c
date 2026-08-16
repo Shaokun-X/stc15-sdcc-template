@@ -7,38 +7,38 @@
 
 
 
-#include	"Exti.h"
+#include	"exti.h"
 
 
 /********************* INT0中断函数 *************************/
-void Ext_INT0 (void) __interrupt (INT0_VECTOR)		//进中断时已经清除标志
-{
-	P00 = ~P00;
-}
+// void Ext_INT0 (void) __interrupt (INT0_VECTOR)		//进中断时已经清除标志
+// {
+// 	P00 = ~P00;
+// }
 
 /********************* INT1中断函数 *************************/
-void Ext_INT1 (void) __interrupt (INT1_VECTOR)		//进中断时已经清除标志
-{
-	P01 = ~P01;
-}
+// void Ext_INT1 (void) __interrupt (INT1_VECTOR)		//进中断时已经清除标志
+// {
+// 	P01 = ~P01;
+// }
 
 /********************* INT2中断函数 *************************/
-void Ext_INT2 (void) __interrupt (INT2_VECTOR)	//
-{
-	P02 = ~P02;
-}
+// void Ext_INT2 (void) __interrupt (INT2_VECTOR)	//
+// {
+// 	P02 = ~P02;
+// }
 
 /********************* INT3中断函数 *************************/
-void Ext_INT3 (void) __interrupt (INT3_VECTOR)
-{
-	P03 = ~P03;
-}
+// void Ext_INT3 (void) __interrupt (INT3_VECTOR)
+// {
+// 	P03 = ~P03;
+// }
 
 /********************* INT4中断函数 *************************/
-void Ext_INT4 (void) __interrupt (INT4_VECTOR)
-{
-	P04 = ~P04;
-}
+// void Ext_INT4 (void) __interrupt (INT4_VECTOR)
+// {
+// 	P04 = ~P04;
+// }
 
 //========================================================================
 // 函数: u8	Ext_Inilize(u8 EXT, EXTI_InitTypeDef *INTx)

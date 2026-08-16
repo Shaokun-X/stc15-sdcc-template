@@ -1,5 +1,5 @@
 
-#include "USART.h"
+#include "usart.h"
 
 
 COMx_Define	COM1,COM2;
@@ -125,6 +125,7 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx)
 
 void TX1_write2buff(u8 dat)	//写入发送缓冲，指针+1
 {
+	#if(UART_QUEUE_MODE == 1)
 	TX1_Buffer[COM1.TX_write] = dat;	//装发送缓冲
 	if(++COM1.TX_write >= COM_TX1_Lenth)	COM1.TX_write = 0;
 
@@ -133,10 +134,17 @@ void TX1_write2buff(u8 dat)	//写入发送缓冲，指针+1
 		COM1.B_TX_busy = 1;		//标志忙
 		TI = 1;					//触发发送中断
 	}
+	#else
+    //以下是阻塞方式发送方法
+    SBUF = dat;
+    COM1.B_TX_busy = 1;//标志忙
+    while(COM1.B_TX_busy);
+    #endif
 }
 
 void TX2_write2buff(u8 dat)	//写入发送缓冲，指针+1
 {
+	#if(UART_QUEUE_MODE == 1)
 	TX2_Buffer[COM2.TX_write] = dat;	//装发送缓冲
 	if(++COM2.TX_write >= COM_TX2_Lenth)	COM2.TX_write = 0;
 
@@ -145,16 +153,12 @@ void TX2_write2buff(u8 dat)	//写入发送缓冲，指针+1
 		COM2.B_TX_busy = 1;		//标志忙
 		SET_TI2();				//触发发送中断
 	}
-}
-
-void PrintString1(u8 *puts)
-{
-    for (; *puts != 0;	puts++)  TX1_write2buff(*puts); 	//遇到停止符0结束
-}
-
-void PrintString2(u8 *puts)
-{
-    for (; *puts != 0;	puts++)  TX2_write2buff(*puts); 	//遇到停止符0结束
+    #else
+    //以下是阻塞方式发送方法
+    S2BUF = dat;
+    COM2.B_TX_busy = 1;//标志忙
+    while(COM2.B_TX_busy);
+    #endif
 }
 
 /*
@@ -170,59 +174,77 @@ void PrintString(COMx_Define *COMx, u8 *puts)
 }
 */
 
-
 /********************* UART1中断函数************************/
-void UART1_int (void) __interrupt (UART1_VECTOR)
-{
-	if(RI)
-	{
-		RI = 0;
-		if(COM1.B_RX_OK == 0)
-		{
-			if(COM1.RX_Cnt >= COM_RX1_Lenth)	COM1.RX_Cnt = 0;
-			RX1_Buffer[COM1.RX_Cnt++] = SBUF;
-			COM1.RX_TimeOut = TimeOutSet1;
-		}
-	}
+// void UART1_int (void) __interrupt (UART1_VECTOR)
+// {
+// 	if(RI)
+// 	{
+// 		RI = 0;
+// 		if(COM1.B_RX_OK == 0)
+// 		{
+// 			if(COM1.RX_Cnt >= COM_RX1_Lenth)	COM1.RX_Cnt = 0;
+// 			RX1_Buffer[COM1.RX_Cnt++] = SBUF;
+// 			COM1.RX_TimeOut = TimeOutSet1;
+// 		}
+// 	}
 
-	if(TI)
-	{
-		TI = 0;
-		if(COM1.TX_read != COM1.TX_write)
-		{
-		 	SBUF = TX1_Buffer[COM1.TX_read];
-			if(++COM1.TX_read >= COM_TX1_Lenth)		COM1.TX_read = 0;
-		}
-		else	COM1.B_TX_busy = 0;
-	}
-}
+// 	if(TI)
+// 	{
+// 		TI = 0;
+
+// 		#if(UART_QUEUE_MODE == 1)//判断是否使用队列模式
+// 		if(COM1.TX_read != COM1.TX_write)
+// 		{
+// 		 	SBUF = TX1_Buffer[COM1.TX_read];
+// 			if(++COM1.TX_read >= COM_TX1_Lenth)		COM1.TX_read = 0;
+// 		}
+// 		else	COM1.B_TX_busy = 0;
+//         #else
+//         COM1.B_TX_busy = 0;//使用阻塞方式发送直接清除繁忙标志
+//         #endif
+// 	}
+// }
 
 /********************* UART2中断函数************************/
-void UART2_int (void) __interrupt (UART2_VECTOR)
+// void UART2_int (void) __interrupt (UART2_VECTOR)
+// {
+// 	if(RI2)
+// 	{
+// 		CLR_RI2();
+// 		if(COM2.B_RX_OK == 0)
+// 		{
+// 			if(COM2.RX_Cnt >= COM_RX2_Lenth)	COM2.RX_Cnt = 0;
+// 			RX2_Buffer[COM2.RX_Cnt++] = S2BUF;
+// 			COM2.RX_TimeOut = TimeOutSet2;
+// 		}
+// 	}
+
+// 	if(TI2)
+// 	{
+// 		CLR_TI2();
+
+// 		#if(UART_QUEUE_MODE == 1)//判断是否使用队列模式
+// 		if(COM2.TX_read != COM2.TX_write)
+// 		{
+// 		 	S2BUF = TX2_Buffer[COM2.TX_read];
+// 			if(++COM2.TX_read >= COM_TX2_Lenth)		COM2.TX_read = 0;
+// 		}
+// 		else	COM2.B_TX_busy = 0;
+//         #else
+//         COM2.B_TX_busy = 0;//使用阻塞方式发送直接清除繁忙标志
+//         #endif
+// 	}
+
+// }
+
+int putchar(int c)
 {
-	if(RI2)
-	{
-		CLR_RI2();
-		if(COM2.B_RX_OK == 0)
-		{
-			if(COM2.RX_Cnt >= COM_RX2_Lenth)	COM2.RX_Cnt = 0;
-			RX2_Buffer[COM2.RX_Cnt++] = S2BUF;
-			COM2.RX_TimeOut = TimeOutSet2;
-		}
-	}
-
-	if(TI2)
-	{
-		CLR_TI2();
-		if(COM2.TX_read != COM2.TX_write)
-		{
-		 	S2BUF = TX2_Buffer[COM2.TX_read];
-			if(++COM2.TX_read >= COM_TX2_Lenth)		COM2.TX_read = 0;
-		}
-		else	COM2.B_TX_busy = 0;
-	}
-
+#if STDIO_USART == USART1
+    TX1_write2buff(c);
+#elif STDIO_USART == USART2
+	TX2_write2buff(c);
+#else
+#error "STDIO_USART must be USART1 or USART2"
+#endif
+    return c;
 }
-
-
-

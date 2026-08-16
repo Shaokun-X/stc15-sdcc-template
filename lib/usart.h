@@ -67,8 +67,6 @@ extern	u8 	__xdata RX2_Buffer[COM_RX2_Lenth];	//接收缓冲
 u8	USART_Configuration(u8 UARTx, COMx_InitDefine *COMx);
 void TX1_write2buff(u8 dat);	//写入发送缓冲，指针+1
 void TX2_write2buff(u8 dat);	//写入发送缓冲，指针+1
-void PrintString1(u8 *puts);
-void PrintString2(u8 *puts);
 
 //void COMx_write2buff(COMx_Define *COMx, u8 dat);	//写入发送缓冲，指针+1
 //void PrintString(COMx_Define *COMx, u8 *puts);

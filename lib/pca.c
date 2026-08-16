@@ -1,5 +1,5 @@
 
-#include	"PCA.h"
+#include	"pca.h"
 
 __bit		B_Capture0,B_Capture1,B_Capture2;
 u8		PCA0_mode,PCA1_mode,PCA2_mode;
@@ -151,38 +151,38 @@ void	PCA_Init(u8 PCA_id, PCA_InitTypeDef *PCAx)
 // 返回: none.
 // 版本: V1.0, 2012-11-22
 //========================================================================
-void	PCA_Handler (void) __interrupt (PCA_VECTOR)
-{
-	if(CCF0)		//PCA模块0中断
-	{
-		CCF0 = 0;		//清PCA模块0中断标志
-		if(P25)	CCAP0_tmp += PCA_Timer0;	//输出为高电平，则给影射寄存器装载高电平时间长度
-		else	CCAP0_tmp += PWM0_low;	//输出为低电平，则给影射寄存器装载低电平时间长度
-		CCAP0L = (u8)CCAP0_tmp;			//将影射寄存器写入捕获寄存器，先写CCAP0L
-		CCAP0H = (u8)(CCAP0_tmp >> 8);	//后写CCAP0H
-	}
+// void	PCA_Handler (void) __interrupt (PCA_VECTOR)
+// {
+// 	if(CCF0)		//PCA模块0中断
+// 	{
+// 		CCF0 = 0;		//清PCA模块0中断标志
+// 		if(P25)	CCAP0_tmp += PCA_Timer0;	//输出为高电平，则给影射寄存器装载高电平时间长度
+// 		else	CCAP0_tmp += PWM0_low;	//输出为低电平，则给影射寄存器装载低电平时间长度
+// 		CCAP0L = (u8)CCAP0_tmp;			//将影射寄存器写入捕获寄存器，先写CCAP0L
+// 		CCAP0H = (u8)(CCAP0_tmp >> 8);	//后写CCAP0H
+// 	}
 
-	if(CCF1)	//PCA模块1中断
-	{
-		CCF1 = 0;		//清PCA模块1中断标志
-		if(P26)	CCAP1_tmp += PCA_Timer1;	//输出为高电平，则给影射寄存器装载高电平时间长度
-		else	CCAP1_tmp += PWM1_low;	//输出为低电平，则给影射寄存器装载低电平时间长度
-		CCAP1L = (u8)CCAP1_tmp;			//将影射寄存器写入捕获寄存器，先写CCAP0L
-		CCAP1H = (u8)(CCAP1_tmp >> 8);	//后写CCAP0H
-	}
+// 	if(CCF1)	//PCA模块1中断
+// 	{
+// 		CCF1 = 0;		//清PCA模块1中断标志
+// 		if(P26)	CCAP1_tmp += PCA_Timer1;	//输出为高电平，则给影射寄存器装载高电平时间长度
+// 		else	CCAP1_tmp += PWM1_low;	//输出为低电平，则给影射寄存器装载低电平时间长度
+// 		CCAP1L = (u8)CCAP1_tmp;			//将影射寄存器写入捕获寄存器，先写CCAP0L
+// 		CCAP1H = (u8)(CCAP1_tmp >> 8);	//后写CCAP0H
+// 	}
 
-	if(CCF2)	//PCA模块2中断
-	{
-		CCF2 = 0;		//清PCA模块1中断标志
-		if(P27)	CCAP2_tmp += PCA_Timer2;	//输出为高电平，则给影射寄存器装载高电平时间长度
-		else	CCAP2_tmp += PWM2_low;	//输出为低电平，则给影射寄存器装载低电平时间长度
-		CCAP2L = (u8)CCAP2_tmp;			//将影射寄存器写入捕获寄存器，先写CCAP0L
-		CCAP2H = (u8)(CCAP2_tmp >> 8);	//后写CCAP0H
-	}
+// 	if(CCF2)	//PCA模块2中断
+// 	{
+// 		CCF2 = 0;		//清PCA模块1中断标志
+// 		if(P27)	CCAP2_tmp += PCA_Timer2;	//输出为高电平，则给影射寄存器装载高电平时间长度
+// 		else	CCAP2_tmp += PWM2_low;	//输出为低电平，则给影射寄存器装载低电平时间长度
+// 		CCAP2L = (u8)CCAP2_tmp;			//将影射寄存器写入捕获寄存器，先写CCAP0L
+// 		CCAP2H = (u8)(CCAP2_tmp >> 8);	//后写CCAP0H
+// 	}
 
-/*	if(CF)	//PCA溢出中断
-	{
-		CF = 0;			//清PCA溢出中断标志
-	}
-*/
-}
+// /*	if(CF)	//PCA溢出中断
+// 	{
+// 		CF = 0;			//清PCA溢出中断标志
+// 	}
+// */
+// }
