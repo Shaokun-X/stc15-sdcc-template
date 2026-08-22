@@ -33,19 +33,35 @@
 #define ADC_RES_H8L2	0
 
 
-typedef struct
-{
-	u8	ADC_Px;			//设置要做ADC的IO,	ADC_P10 ~ ADC_P17,ADC_P1_All
-	u8	ADC_Speed;		//ADC速度			ADC_90T,ADC_180T,ADC_360T,ADC_540T
-	u8	ADC_Power;		//ADC功率允许/关闭	ENABLE,DISABLE
-	u8	ADC_AdjResult;	//ADC结果调整,	ADC_RES_H2L8,ADC_RES_H8L2
-	u8	ADC_Polity;		//优先级设置	PolityHigh,PolityLow
-	u8	ADC_Interrupt;	//中断允许		ENABLE,DISABLE
-} ADC_InitTypeDef;
+/*
+ * Configure the ADC directly.
+ * PINS: ADC_P10 through ADC_P17, ADC_P1_All, or a bitwise OR of pins
+ * SPEED: ADC_90T, ADC_180T, ADC_360T, ADC_540T
+ * POWER: ENABLE, DISABLE
+ * ADJUSTMENT: ADC_RES_H2L8, ADC_RES_H8L2
+ * INTERRUPT: ENABLE, DISABLE
+ * PRIORITY: PriorityHigh, PriorityLow
+ * All arguments must be side-effect-free.
+ */
+#define ADC_INIT(PINS, SPEED, POWER, ADJUSTMENT, INTERRUPT, PRIORITY) do { \
+	P1ASF = (PINS); \
+	ADC_CONTR = (ADC_CONTR & ~ADC_90T) | (SPEED); \
+	ADC_CONTR = (ADC_CONTR & 0x7f) | (((POWER) == ENABLE) << 7); \
+	PCON2 = (PCON2 & ~(1 << 5)) | (((ADJUSTMENT) == ADC_RES_H2L8) << 5); \
+	EADC = ((INTERRUPT) == ENABLE); \
+	PADC = ((PRIORITY) == PriorityHigh); \
+} while (0)
 
-void	ADC_Inilize(ADC_InitTypeDef *ADCx);
-void	ADC_PowerControl(u8 pwr);
-u8		ADC_StartConversion(u8 channel);
+/* POWER: ENABLE, DISABLE */
+#define ADC_POWER_CONTROL(POWER) do { \
+	ADC_CONTR = (ADC_CONTR & 0x7f) | (((POWER) == ENABLE) << 7); \
+} while (0)
+
+/* CHANNEL: ADC_CH0 through ADC_CH7 */
+#define ADC_START_CONVERSION(CHANNEL) do { \
+	ADC_CONTR = (ADC_CONTR & 0xe0) | ADC_START | (CHANNEL); \
+} while (0)
+
 u16		ADC_ReadResult(void);
 u16		Get_ADC10bitResult(u8 channel);	//channel = 0~7
 

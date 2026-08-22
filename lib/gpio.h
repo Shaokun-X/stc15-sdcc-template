@@ -27,12 +27,17 @@
 #define	GPIO_P5			5
 
 
-typedef struct
-{
-	u8	Mode;		//IO模式,  		GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
-	u8	Pin;		//要设置的端口	
-} GPIO_InitTypeDef;
-
-u8	GPIO_Inilize(u8 GPIO, GPIO_InitTypeDef *GPIOx);
+/*
+ * Configure pins without allocating init configuration in RAM.
+ * PORT: P0, P1, P2, P3, P4, P5
+ * PINS: GPIO_Pin_0 through GPIO_Pin_7, GPIO_Pin_All, or a bitwise OR of pins
+ * MODE: GPIO_PullUp, GPIO_HighZ, GPIO_OUT_OD, GPIO_OUT_PP
+ * All arguments must be side-effect-free.
+ * Example: GPIO_INIT(P3, GPIO_Pin_2, GPIO_OUT_PP);
+ */
+#define GPIO_INIT(PORT, PINS, MODE) do { \
+	PORT##M1 = (PORT##M1 & ~(PINS)) | (((MODE) & 1) ? (PINS) : 0); \
+	PORT##M0 = (PORT##M0 & ~(PINS)) | (((MODE) & 2) ? (PINS) : 0); \
+} while (0)
 
 #endif

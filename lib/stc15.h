@@ -833,8 +833,8 @@ b0 - T0CLKO    : 允许 T0 溢出脉冲在P3.5脚输出，Fck0 = 1/2 T0 溢出�
 
 //========================================
 
-#define	PolityLow			0	//低优先级中断
-#define	PolityHigh			1	//高优先级中断
+#define	PriorityLow			0	//低优先级中断
+#define	PriorityHigh			1	//高优先级中断
 
 //========================================
 
@@ -845,6 +845,8 @@ b0 - T0CLKO    : 允许 T0 溢出脉冲在P3.5脚输出，Fck0 = 1/2 T0 溢出�
 
 #define		ENABLE		1
 #define		DISABLE		0
+#define		HIGH		1
+#define		LOW			0
 
 #define		STC15F_L2K08S2	8
 #define		STC15F_L2K16S2	16

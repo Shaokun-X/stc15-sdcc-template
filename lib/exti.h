@@ -13,13 +13,36 @@
 #define	EXT_MODE_RiseFall	0	//上升沿/下降沿中断
 #define	EXT_MODE_Fall		1	//下降沿中断
 
-typedef struct
-{
-	u8	EXTI_Mode;			//中断模式,  	EXT_MODE_RiseFall, EXT_MODE_Fall
-	u8	EXTI_Polity;		//优先级设置	PolityHigh,PolityLow
-	u8	EXTI_Interrupt;		//中断允许		ENABLE,DISABLE
-} EXTI_InitTypeDef;
+/*
+ * Configure INT0 or INT1.
+ * MODE: EXT_MODE_RiseFall, EXT_MODE_Fall
+ * PRIORITY: PriorityHigh, PriorityLow
+ * INTERRUPT: ENABLE, DISABLE
+ */
+#define EXTI0_INIT(MODE, PRIORITY, INTERRUPT) do { \
+	EX0 = ((INTERRUPT) == ENABLE); \
+	PX0 = ((PRIORITY) == PriorityHigh); \
+	IT0 = ((MODE) == EXT_MODE_Fall); \
+} while (0)
+#define EXTI1_INIT(MODE, PRIORITY, INTERRUPT) do { \
+	EX1 = ((INTERRUPT) == ENABLE); \
+	PX1 = ((PRIORITY) == PriorityHigh); \
+	IT1 = ((MODE) == EXT_MODE_Fall); \
+} while (0)
 
-u8	Ext_Inilize(u8 EXT, EXTI_InitTypeDef *INTx);
+/*
+ * Configure INT2, INT3, or INT4. Operation is fixed to falling-edge and
+ * low priority.
+ * INTERRUPT: ENABLE, DISABLE
+ */
+#define EXTI2_INIT(INTERRUPT) do { \
+	INT_CLKO = (INT_CLKO & ~(1 << 4)) | (((INTERRUPT) == ENABLE) << 4); \
+} while (0)
+#define EXTI3_INIT(INTERRUPT) do { \
+	INT_CLKO = (INT_CLKO & ~(1 << 5)) | (((INTERRUPT) == ENABLE) << 5); \
+} while (0)
+#define EXTI4_INIT(INTERRUPT) do { \
+	INT_CLKO = (INT_CLKO & ~(1 << 6)) | (((INTERRUPT) == ENABLE) << 6); \
+} while (0)
 
 #endif

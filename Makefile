@@ -183,7 +183,7 @@ TARGET_ARCH := -mmcs51
 MEMORY_MODEL := --model-medium
 IRAM_SIZE := 256
 XRAM_SIZE := 256
-STACK_SIZE := 112
+STACK_SIZE := 128
 FLASH_SIZE := 8192
 ISP_FREQUENCY := 32000
 
@@ -253,8 +253,15 @@ download:
 $(DEP_FILE):
 	@mkdir -p $(OBJDIR_TREE)
 	@rm -f $(DEP_FILE)
-	@for srcFile in $(LOCAL_SRCS) $(VENDER_SRCS); do $(CC) $(CPPFLAGS) -MM $${srcFile} >> $(DEP_FILE); echo '' >> $(DEP_FILE); done
-	@$(SED_CMD) "s/^\(.*\.rel:.*\)/$(BUILD_ROOT)\/\1/g" $(DEP_FILE)
+	@for srcFile in $(LOCAL_SRCS) $(VENDER_SRCS); do \
+		case "$${srcFile}" in \
+			$(VENDER_DIR)/*) objFile="$(OBJDIR)/$${srcFile#$(VENDER_DIR)/}" ;; \
+			*) objFile="$(OBJDIR)/$${srcFile}" ;; \
+		esac; \
+		objFile="$${objFile%.c}.rel"; \
+		$(CC) $(CPPFLAGS) -MM "$${srcFile}" | sed "1s|^[^:]*:|$${objFile}:|" >> $(DEP_FILE); \
+		echo '' >> $(DEP_FILE); \
+	done
 
 
 # -------------------------------------------
