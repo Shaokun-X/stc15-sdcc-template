@@ -2,8 +2,6 @@
 #ifndef	__GPIO_H
 #define	__GPIO_H
 
-#include	"config.h"
-
 #define	GPIO_PullUp		0	//上拉准双向口
 #define	GPIO_HighZ		1	//浮空输入
 #define	GPIO_OUT_OD		2	//开漏输出
@@ -36,8 +34,10 @@
  * Example: GPIO_INIT(P3, GPIO_Pin_2, GPIO_OUT_PP);
  */
 #define GPIO_INIT(PORT, PINS, MODE) do { \
-	PORT##M1 = (PORT##M1 & ~(PINS)) | (((MODE) & 1) ? (PINS) : 0); \
-	PORT##M0 = (PORT##M0 & ~(PINS)) | (((MODE) & 2) ? (PINS) : 0); \
+	PORT##M1 = (PORT##M1 & ~(PINS)) | \
+		(((MODE) == GPIO_HighZ || (MODE) == GPIO_OUT_OD) ? (PINS) : 0); \
+	PORT##M0 = (PORT##M0 & ~(PINS)) | \
+		(((MODE) == GPIO_OUT_OD || (MODE) == GPIO_OUT_PP) ? (PINS) : 0); \
 } while (0)
 
 #endif

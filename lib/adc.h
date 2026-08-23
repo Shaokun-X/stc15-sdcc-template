@@ -46,10 +46,10 @@
 #define ADC_INIT(PINS, SPEED, POWER, ADJUSTMENT, INTERRUPT, PRIORITY) do { \
 	P1ASF = (PINS); \
 	ADC_CONTR = (ADC_CONTR & ~ADC_90T) | (SPEED); \
-	ADC_CONTR = (ADC_CONTR & 0x7f) | (((POWER) == ENABLE) << 7); \
 	PCON2 = (PCON2 & ~(1 << 5)) | (((ADJUSTMENT) == ADC_RES_H2L8) << 5); \
 	EADC = ((INTERRUPT) == ENABLE); \
 	PADC = ((PRIORITY) == PriorityHigh); \
+	ADC_CONTR = (ADC_CONTR & 0x7f) | (((POWER) == ENABLE) << 7); \
 } while (0)
 
 /* POWER: ENABLE, DISABLE */

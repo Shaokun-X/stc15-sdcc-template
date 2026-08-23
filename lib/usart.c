@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include "usart.h"
 
 #if STDIO_USART == USART1

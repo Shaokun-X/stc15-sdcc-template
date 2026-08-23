@@ -18,6 +18,7 @@
 ******************************************/
 
 #include	"delay.h"
+#include 	"config.h"
 
 /* SDCC emits a MOV and two DJNZ loops; this compensates their per-us cost. */
 #define DELAY_US_LOOPS ((MAIN_Fosc - 3000000UL) / 4000000UL)
