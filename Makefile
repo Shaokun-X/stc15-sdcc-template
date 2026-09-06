@@ -210,6 +210,8 @@ DEP_FILE := $(OBJDIR)/dependencies.mk
 SRCS := \
 	$(SRC_DIR)/main.c
 
+HEADERS := $(wildcard *.h $(VENDER_DIR)/*.h $(SRC_DIR)/*.h)
+
 VENDER_SRCS := $(filter $(VENDER_DIR)%, $(SRCS))
 VENDER_OBJS := $(subst $(VENDER_DIR),$(OBJDIR),$(subst .c,.rel,$(VENDER_SRCS)))
 
@@ -250,19 +252,20 @@ download:
 # SDCC's dependencies generation is buggy and doesn't match the GCC
 # documentation (which the SDCC manual says should apply), so we 
 # need to compensate for this.
-$(DEP_FILE):
+$(DEP_FILE): $(SRCS) $(HEADERS) Makefile
 	@mkdir -p $(OBJDIR_TREE)
-	@rm -f $(DEP_FILE)
-	@for srcFile in $(LOCAL_SRCS) $(VENDER_SRCS); do \
-		case "$${srcFile}" in \
-			$(VENDER_DIR)/*) objFile="$(OBJDIR)/$${srcFile#$(VENDER_DIR)/}" ;; \
-			*) objFile="$(OBJDIR)/$${srcFile}" ;; \
-		esac; \
-		objFile="$${objFile%.c}.rel"; \
-		$(CC) $(CPPFLAGS) -MM "$${srcFile}" | sed "1s|^[^:]*:|$${objFile}:|" >> $(DEP_FILE); \
-		echo '' >> $(DEP_FILE); \
-	done
-
+	@set -e; { \
+		for srcFile in $(LOCAL_SRCS) $(VENDER_SRCS); do \
+			case "$${srcFile}" in \
+				$(VENDER_DIR)/*) objFile="$(OBJDIR)/$${srcFile#$(VENDER_DIR)/}" ;; \
+				*) objFile="$(OBJDIR)/$${srcFile}" ;; \
+			esac; \
+			objFile="$${objFile%.c}.rel"; \
+			$(CC) $(CPPFLAGS) -MM "$${srcFile}" | sed "1s|^[^:]*:|$${objFile}:|"; \
+			echo ''; \
+		done; \
+	} > $(DEP_FILE).tmp
+	@mv $(DEP_FILE).tmp $(DEP_FILE)
 
 # -------------------------------------------
 
