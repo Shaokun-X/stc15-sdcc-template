@@ -10,7 +10,7 @@
 // #define MAIN_Fosc		11059200L	//定义主时钟
 // #define MAIN_Fosc		 5529600L	//定义主时钟
 // #define MAIN_Fosc		24000000L	//定义主时钟
-#define MAIN_Fosc		32000000L	//定义主时钟
+#define MAIN_Fosc		36000000L	//定义主时钟
 #define STDIO_USART		USART1
 #define UART_QUEUE_MODE 1
 

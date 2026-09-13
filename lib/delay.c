@@ -11,17 +11,23 @@
 /*---------------------------------------------------------------------*/
 
 
-/*************	功能说明	**************
-
-本文件为STC15xxx系列的延时程序,用户几乎可以不修改这个程序.
-
-******************************************/
+/* Busy-wait delays for the STC15 1T core, calibrated for SDCC using
+ * MAIN_Fosc. Recheck the generated assembly after changing toolchains or
+ * optimization settings.
+ */
 
 #include	"delay.h"
 #include 	"config.h"
 
-/* SDCC emits a MOV and two DJNZ loops; this compensates their per-us cost. */
-#define DELAY_US_LOOPS ((MAIN_Fosc - 3000000UL) / 4000000UL)
+/* SDCC emits a 1T MOV, a 2T inner DJNZ, and a 2T outer DJNZ. The formula
+ * rounds the inner-loop count to the nearest whole iteration.
+ */
+#define DELAY_US_LOOPS ((MAIN_Fosc - 2000000UL) / 2000000UL)
+
+/* SDCC's 16-bit decrement loop takes about 7T per iteration; decrementing
+ * the high byte adds 1T once every 256 iterations.
+ */
+#define DELAY_MS_LOOPS (MAIN_Fosc / 7000UL)
 
 
 void delay_us(unsigned char us)
@@ -29,7 +35,7 @@ void delay_us(unsigned char us)
 	if(!us)	return;
 
 #if MAIN_Fosc < 8000000UL
-	/* At low clock rates, the call and outer loop provide the delay. */
+	/* A calibrated inner loop does not fit here; use the shortest loop. */
 	do {
 		__asm__("nop");
 	} while(--us);
@@ -45,15 +51,6 @@ void delay_us(unsigned char us)
 }
 
 
-//========================================================================
-// 函数: void  delay_ms(unsigned int ms)
-// 描述: 延时函数。
-// 参数: ms,要延时的ms数, 支持0~65535ms. 自动适应主时钟.
-// 返回: none.
-// 版本: VER1.0
-// 日期: 2013-4-1
-// 备注: 
-//========================================================================
 void  delay_ms(unsigned int ms)
 {
      unsigned int i;
@@ -61,7 +58,7 @@ void  delay_ms(unsigned int ms)
 	 if(!ms)	return;
 
 	 do{
-	      i = MAIN_Fosc / 13000;
-		  while(--i)	;   //14T per loop
+	      i = DELAY_MS_LOOPS;
+		  while(--i)	;
 	 }while(--ms);
 }

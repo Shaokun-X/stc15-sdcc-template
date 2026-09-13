@@ -131,6 +131,8 @@ __sfr __at (0xDC) CCAPM2;	//PCA模块2的工作模式寄存器。
 __sfr __at (0xE0) ACC;
 __sfr __at (0xE1) P7M1;
 __sfr __at (0xE2) P7M0;
+__sfr __at (0xE6) CMPCR1;
+__sfr __at (0xE7) CMPCR2;
 
 __sfr __at (0xE8) P6;
 __sfr __at (0xE9) CL;	//
@@ -823,6 +825,7 @@ b0 - T0CLKO    : 允许 T0 溢出脉冲在P3.5脚输出，Fck0 = 1/2 T0 溢出�
 #define		UART4_VECTOR	18
 #define		TIMER3_VECTOR	19
 #define		TIMER4_VECTOR	20
+#define		COMPARATOR_VECTOR 21
 
 
 #define	TRUE	1
